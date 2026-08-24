@@ -1,4 +1,4 @@
-const core = require('@actions/core')
+import { getInput, setFailed } from '@actions/core'
 
 const { addLabel, setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, leaveComment, lockSpamIssue, orgBlockUser, getUser } = require('./github')
 const { recognizeTitle } = require('./bot')
@@ -60,7 +60,7 @@ async function run () {
   try {
     if (context.payload.sender.id === 78363386) return // ignore bot
 
-    const token = core.getInput('github-token')
+    const token = getInput('github-token')
     const { owner, repo } = getRepo()
     const issue = await getIssue(token)
     const { type: prefixTag, title } = recognizeTitle(issue.title)
@@ -105,7 +105,7 @@ async function run () {
       // transfer, appeal, issue, suggestion
     }
   } catch (error) {
-    core.setFailed(error.message)
+    setFailed(error.message)
   }
 }
 

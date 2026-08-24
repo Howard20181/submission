@@ -1,4 +1,4 @@
-const { context, getOctokit } = require('@actions/github')
+import { context, getOctokit } from '@actions/github'
 
 function getPrNumber () {
   const pullRequest = context.payload.pull_request
