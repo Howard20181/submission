@@ -1,7 +1,7 @@
 import { getInput, setFailed } from '@actions/core'
 
-import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, leaveComment, lockSpamIssue, orgBlockUser } from './github'
-import { recognizeTitle } from './bot'
+import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
+import { recognizeTitle } from './bot.js'
 import { context } from '@actions/github'
 
 async function approve (token, owner, repo, issueNo, username, title) {
