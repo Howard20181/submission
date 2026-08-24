@@ -1,4 +1,4 @@
-function recognizeTitle (title) {
+export function recognizeTitle (title) {
   const match = title.match(/^\[([^\]]+)]\s*(.*?)\s*$/)
   if (match) {
     match[1] = match[1].toLowerCase()
@@ -27,7 +27,7 @@ function recognizeTitle (title) {
   }
 }
 
-function checkPackageName (packageName) {
+export function checkPackageName (packageName) {
   if (!packageName.match(/\./)) return false
   const groups = packageName.split('.')
   for (const group of groups) {
@@ -38,8 +38,4 @@ function checkPackageName (packageName) {
     if (packageName.toLowerCase().startsWith(item)) return false
   }
   return true
-}
-
-module.exports = {
-  recognizeTitle
 }

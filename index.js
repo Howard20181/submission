@@ -1,8 +1,8 @@
 import { getInput, setFailed } from '@actions/core'
 
-const { addLabel, setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, leaveComment, lockSpamIssue, orgBlockUser, getUser } = require('./github')
-const { recognizeTitle } = require('./bot')
-const { context } = require('@actions/github')
+import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, leaveComment, lockSpamIssue, orgBlockUser } from './github'
+import { recognizeTitle } from './bot'
+import { context } from '@actions/github'
 
 async function approve (token, owner, repo, issueNo, username, title) {
   const result = await createAndInviteToRepo(token, owner, username, title)
