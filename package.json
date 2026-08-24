@@ -3,11 +3,11 @@
     "lint": "standard --fix"
   },
   "dependencies": {
-    "@actions/core": "^1.10.1",
-    "@actions/github": "^6.0.0"
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1"
   },
   "devDependencies": {
-    "standard": "^17.1.0"
+    "standard": "^17.1.2"
   },
-  "packageManager": "yarn@3.1.1"
+  "packageManager": "pnpm@10.32.1"
 }
