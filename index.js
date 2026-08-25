@@ -18,7 +18,7 @@ async function approve (token, owner, repo, issueNo, username, title) {
       "If you complied with those requirements but your repo didn't appear in more than 10 minutes, please file an issue to let us know, thanks!\n\n" +
       'Welcome `' + title + '`!'
     )
-    await setLabel(token, owner, repo, issueNo, 'approved') // clear other labels
+    await setLabel(token, owner, repo, issueNo, ['approved']) // clear other labels
     await closeIssue(token, owner, repo, issueNo, true)
   } else {
     await leaveComment(token, owner, repo, issueNo,
@@ -27,19 +27,20 @@ async function approve (token, owner, repo, issueNo, username, title) {
       "If you believe that's a fraudulent use, please contact a human by " +
       'https://modules.lsposed.org/submission?type=appeal'
     )
-    await setLabel(token, owner, repo, issueNo, 'conflict') // clear other labels
+    await setLabel(token, owner, repo, issueNo, ['conflict']) // clear other labels
     await closeIssue(token, owner, repo, issueNo)
   }
 }
 
 async function closeSpam (token, owner, repo, issueNo, username = '') { // pass username if block
-  await setLabel(token, owner, repo, issueNo, 'spam') // clear other labels
+  await setLabel(token, owner, repo, issueNo, ['spam']) // clear other labels
   await closeIssue(token, owner, repo, issueNo)
   await lockSpamIssue(token, owner, repo, issueNo)
   if (username !== '') await orgBlockUser(token, owner, username)
 }
 
 async function closeInvalid (token, owner, repo, issueNo, username, close = true) {
+  await setLabel(token, owner, repo, issueNo, ['invalid']) // clear other labels
   await leaveComment(token, owner, repo, issueNo,
     'It seems like your request has an invalid package name, please consider another package name ' +
     '(e.g. `io.github.' + username + '.[appname]`).\n' +

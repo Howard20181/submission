@@ -96,13 +96,13 @@ export async function addLabel (token, owner, repo, issueNumber, label) {
   })
 }
 
-export async function setLabel (token, owner, repo, issueNumber, label) {
+export async function setLabel (token, owner, repo, issueNumber, labels) {
   const octokit = getOctokit(token)
   await octokit.rest.issues.setLabels({
     owner,
     repo,
     issue_number: issueNumber,
-    labels: [label]
+    labels: labels
   })
 }
 
