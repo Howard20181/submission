@@ -70,7 +70,11 @@ async function run () {
     const issueNo = issue.number
     const username = issue.user.login
 
-    if (action === 'labeled') {
+    if (action === 'edited' && context.payload.changes.title !== undefined) {
+      if (prefixTag === 'invalid') {
+        await closeInvalid(token, owner, repo, issueNo, username, false)
+      }
+    } else if (action === 'labeled') {
       const newLabel = context.payload.label.name
       if (prefixTag === 'invalid') {
         await closeInvalid(token, owner, repo, issueNo, username, false)
