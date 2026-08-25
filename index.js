@@ -39,14 +39,14 @@ async function closeSpam (token, owner, repo, issueNo, username = '') { // pass 
   if (username !== '') await orgBlockUser(token, owner, username)
 }
 
-async function closeInvalid (token, owner, repo, issueNo, username) {
+async function closeInvalid (token, owner, repo, issueNo, username, close = true) {
   await leaveComment(token, owner, repo, issueNo,
     'It seems like your request has an invalid package name, please consider another package name ' +
     '(e.g. `io.github.' + username + '.[appname]`).\n' +
     "If that's not true, please contact a human by " +
     'https://modules.lsposed.org/submission?type=appeal'
   )
-  await closeIssue(token, owner, repo, issueNo)
+  if (close) await closeIssue(token, owner, repo, issueNo)
 }
 
 async function manualRequest (token, owner, repo, issueNo) {
@@ -71,7 +71,9 @@ async function run () {
 
     if (action === 'labeled') {
       const newLabel = context.payload.label.name
-      if (newLabel === 'spam') {
+      if (prefixTag === 'invalid') {
+        await closeInvalid(token, owner, repo, issueNo, username, false)
+      } else if (newLabel === 'spam') {
         await closeSpam(token, owner, repo, issueNo, username)
       } else if (newLabel === 'approved' && prefixTag === 'submission' && title) { // TODO: transfer
         await approve(token, owner, repo, issueNo, username, title)
