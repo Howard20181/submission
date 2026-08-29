@@ -62,7 +62,7 @@ async function run () {
     if (context.payload.sender.id === 78363386) return // ignore bot
 
     const token = getInput('github-token')
-    const { owner, repo } = isRepoExists()
+    const { owner, repo } = getRepo()
     const issue = await getIssue(token)
     const { type: prefixTag, title } = recognizeTitle(issue.title)
     const action = context.payload.action
