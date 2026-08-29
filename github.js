@@ -157,3 +157,14 @@ export async function getUser (token, username) {
     username
   })
 }
+
+export async function isRepoExists (token, owner, repo) {
+  const octokit = getOctokit(token)
+  try {
+    await octokit.rest.repos.get(owner, repo)
+    return true
+  } catch (e) {
+    console.error(e)
+    return false
+  }
+}

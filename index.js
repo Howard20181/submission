@@ -1,6 +1,6 @@
 import { getInput, setFailed } from '@actions/core'
 
-import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
+import { setLabel, closeIssue, createAndInviteToRepo, getIssue, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
 import { recognizeTitle } from './bot.js'
 import { context } from '@actions/github'
 
@@ -62,7 +62,7 @@ async function run () {
     if (context.payload.sender.id === 78363386) return // ignore bot
 
     const token = getInput('github-token')
-    const { owner, repo } = getRepo()
+    const { owner, repo } = isRepoExists()
     const issue = await getIssue(token)
     const { type: prefixTag, title } = recognizeTitle(issue.title)
     const action = context.payload.action
@@ -109,7 +109,17 @@ async function run () {
         }
         await approve(token, owner, repo, issueNo, username, title)
       }
-      // transfer, appeal, issue, suggestion
+
+      // transfer
+      if (prefixTag === 'transfer') {
+        const isExists = await isRepoExists(owner, repo)
+        if (!isExists) {
+          await closeSpam(token, owner, repo, issueNo)
+          return
+        }
+      }
+
+      // appeal, issue, suggestion
     }
   } catch (error) {
     setFailed(error.message)
