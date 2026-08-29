@@ -1,6 +1,6 @@
 import { getInput, setFailed } from '@actions/core'
 
-import { setLabel, closeIssue, createAndInviteToRepo, getIssue, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
+import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
 import { recognizeTitle } from './bot.js'
 import { context } from '@actions/github'
 
