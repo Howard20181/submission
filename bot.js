@@ -33,7 +33,7 @@ export function checkPackageName (packageName) {
   for (const group of groups) {
     if (!group.match(/^[a-zA-Z_][a-zA-Z_0-9]*$/) || group.toLowerCase() === 'example') return false
   }
-  const blacklist = ['com.android', 'com.google', 'org.lsposed', 'io.github.lsposed']
+  const blacklist = ['com.android', 'com.google', 'org.lsposed', 'io.github.lsposed', 'com.xiaomi', 'com.android', 'com.chrome']
   for (const item of blacklist) {
     if (packageName.toLowerCase().startsWith(item)) return false
   }
