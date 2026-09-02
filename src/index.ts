@@ -1,7 +1,7 @@
-import { getInput, setFailed } from '@actions/core'
+import { setFailed } from '@actions/core'
 
 import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
-import { recognizeTitle } from './bot.js'
+import { checkTxt, recognizeTitle } from './bot.js'
 import { context } from '@actions/github'
 
 async function approve(token: string, owner: string, repo: string, issueNo: number, username: string, title: string) {
@@ -102,16 +102,11 @@ async function run() {
 
       // submission
       if (prefixTag === 'submission') {
-        // const user = await getUser(token, username)
-        // const createdAtDiffMs = new Date() - new Date(user.data.created_at)
-        // const isNewAccount = createdAtDiffMs < 1000 * 60 * 60 * 24 * 7 /* 7 days */
-        // const isNoFollowers = user.data.followers <= 0
-        // if (isNewAccount || isNoFollowers) {
-        if (true) {
-          await manualRequest(token, owner, repo, issueNo)
+        if (await checkTxt(title, username)) {
+          await approve(token, owner, repo, issueNo, username, title)
           return
         }
-        // await approve(token, owner, repo, issueNo, username, title)
+        await manualRequest(token, owner, repo, issueNo)
       }
 
       // transfer

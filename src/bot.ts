@@ -1,3 +1,27 @@
+import { getDomain } from 'tldts'
+import { Resolver } from 'node:dns/promises'
+
+const resolver = new Resolver()
+resolver.setServers(['1.1.1.1', '8.8.8.8'])
+
+export async function checkTxt(pkg: string, github_username: string) {
+  const hostname = parsePackage(pkg)
+  if (hostname === null || hostname === '') return false
+  const txts = await resolver.resolveTxt(hostname)
+  for (const y of txts) {
+    for (const x of y) {
+      if (!x.startsWith('lsposed-modules-repo-verification=')) continue
+      const content = x.split('=', 1)[1]
+      if (content === github_username) return true
+    }
+  }
+  return false
+}
+
+function parsePackage(pkg: string) {
+  return getDomain(pkg.split('.').reverse().join('.'))
+}
+
 export function recognizeTitle(title: string) {
   const match = title.match(/^\[([^\]]+)]\s*(.*?)\s*$/)
   if (match) {
