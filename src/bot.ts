@@ -11,7 +11,7 @@ export async function checkTxt(pkg: string, github_username: string) {
   for (const y of txts) {
     for (const x of y) {
       if (!x.startsWith('lsposed-modules-repo-verification=')) continue
-      const content = x.split('=', 1)[1]
+      const content = x.split('=', 2)[1]
       if (content === github_username) return true
     }
   }
