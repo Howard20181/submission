@@ -1,7 +1,7 @@
 import { setFailed } from '@actions/core'
 
 import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
-import { checkTxt, recognizeTitle } from './bot.js'
+import { checkTxt, matchPages, recognizeTitle } from './bot.js'
 import { context } from '@actions/github'
 
 async function approve(token: string, owner: string, repo: string, issueNo: number, username: string, title: string) {
@@ -102,7 +102,7 @@ async function run() {
 
       // submission
       if (prefixTag === 'submission') {
-        if (await checkTxt(title, username)) {
+        if (matchPages(title, username) || await checkTxt(title, username)) {
           await approve(token, owner, repo, issueNo, username, title)
           return
         }

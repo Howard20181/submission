@@ -22,6 +22,10 @@ function parsePackage(pkg: string) {
   return getDomain(pkg.split('.').reverse().join('.'))
 }
 
+export function matchPages(pkg: string, github_username: string) {
+  return pkg.toLowerCase().startsWith(`io.github.${github_username}.`)
+}
+
 export function recognizeTitle(title: string) {
   const match = title.match(/^\[([^\]]+)]\s*(.*?)\s*$/)
   if (match) {
