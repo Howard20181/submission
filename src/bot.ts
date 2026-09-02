@@ -23,7 +23,7 @@ function parsePackage(pkg: string) {
 }
 
 export function matchPages(pkg: string, github_username: string) {
-  return pkg.toLowerCase().startsWith(`io.github.${github_username}.`)
+  return pkg.toLowerCase().startsWith(`io.github.${github_username.toLowerCase()}.`)
 }
 
 export function recognizeTitle(title: string) {
