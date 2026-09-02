@@ -1,14 +1,21 @@
 {
-  "type":"module",
+  "type": "module",
   "scripts": {
-    "lint": "standard --fix"
+    "lint": "standard --fix",
+    "build": "tsc",
+    "start": "tsc && tsx src/index.ts"
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
-    "@actions/github": "^9.1.1"
+    "@actions/github": "^9.1.1",
+    "@octokit/plugin-retry": "^8.1.1"
   },
   "devDependencies": {
-    "standard": "^17.1.2"
+    "@octokit/types": "^18.0.0",
+    "@types/node": "^26.4.0",
+    "standard": "^17.1.2",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   },
   "packageManager": "pnpm@11.23.0"
 }

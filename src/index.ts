@@ -4,7 +4,7 @@ import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoE
 import { recognizeTitle } from './bot.js'
 import { context } from '@actions/github'
 
-async function approve (token, owner, repo, issueNo, username, title) {
+async function approve(token: string, owner: string, repo: string, issueNo: number, username: string, title: string) {
   const result = await createAndInviteToRepo(token, owner, username, title)
   if (result) {
     await leaveComment(token, owner, repo, issueNo,
@@ -32,14 +32,14 @@ async function approve (token, owner, repo, issueNo, username, title) {
   }
 }
 
-async function closeSpam (token, owner, repo, issueNo, username = '') { // pass username if block
+async function closeSpam(token: string, owner: string, repo: string, issueNo: number, username: string = '') { // pass username if block
   await setLabel(token, owner, repo, issueNo, ['spam']) // clear other labels
   await closeIssue(token, owner, repo, issueNo)
   await lockSpamIssue(token, owner, repo, issueNo)
   if (username !== '') await orgBlockUser(token, owner, username)
 }
 
-async function closeInvalid (token, owner, repo, issueNo, username, close = true) {
+async function closeInvalid(token: string, owner: string, repo: string, issueNo: number, username: string, close: boolean = true) {
   await setLabel(token, owner, repo, issueNo, ['invalid']) // clear other labels
   await leaveComment(token, owner, repo, issueNo,
     'It seems like your request has an invalid package name, please consider another package name ' +
@@ -50,25 +50,29 @@ async function closeInvalid (token, owner, repo, issueNo, username, close = true
   if (close) await closeIssue(token, owner, repo, issueNo)
 }
 
-async function manualRequest (token, owner, repo, issueNo) {
+async function manualRequest(token: string, owner: string, repo: string, issueNo: number) {
   await leaveComment(token, owner, repo, issueNo,
     'To reduce spam, we do not approve your submission immediately due to certain conditions, ' +
     'please wait for manual approvement.'
   )
 }
 
-async function run () {
+async function run() {
   try {
-    if (context.payload.sender.id === 78363386) return // ignore bot
+    const sender_id = context?.payload?.sender?.id
+    if (sender_id === 78363386) return // ignore bot
 
-    const token = getInput('github-token')
+    const token = process.env.REPO_TOKEN
+    if (token === undefined || token === '') throw Error("REPO_TOKEN is missing")
+
     const { owner, repo } = getRepo()
     const issue = await getIssue(token)
     const { type: prefixTag, title } = recognizeTitle(issue.title)
     const action = context.payload.action
 
     const issueNo = issue.number
-    const username = issue.user.login
+    const username = issue?.user?.login
+    if (username === undefined) return
 
     if (action === 'edited' && context.payload.changes.title !== undefined) {
       if (prefixTag === 'invalid') {
@@ -107,12 +111,12 @@ async function run () {
           await manualRequest(token, owner, repo, issueNo)
           return
         }
-        await approve(token, owner, repo, issueNo, username, title)
+        // await approve(token, owner, repo, issueNo, username, title)
       }
 
       // transfer
       if (prefixTag === 'transfer') {
-        const isExists = await isRepoExists(owner, repo)
+        const isExists = await isRepoExists(token, owner, repo)
         if (!isExists) {
           await closeSpam(token, owner, repo, issueNo)
           return
@@ -121,8 +125,11 @@ async function run () {
 
       // appeal, issue, suggestion
     }
-  } catch (error) {
-    setFailed(error.message)
+  } catch (e) {
+    if (e instanceof Error)
+      setFailed(e.message)
+    else if (typeof e === 'string')
+      setFailed(e)
   }
 }
 

@@ -1,6 +1,7 @@
 import { context, getOctokit } from '@actions/github'
+import { retry } from "@octokit/plugin-retry"
 
-export function getPrNumber () {
+export function getPrNumber() {
   const pullRequest = context.payload.pull_request
   if (!pullRequest) {
     return undefined
@@ -9,7 +10,7 @@ export function getPrNumber () {
   return pullRequest.number
 }
 
-export function getIssueNumber () {
+export function getIssueNumber() {
   const issue = context.payload.issue
   if (!issue) {
     return undefined
@@ -18,18 +19,17 @@ export function getIssueNumber () {
   return issue.number
 }
 
-export function getRepo () {
+export function getRepo() {
   return context.repo
 }
 
-export async function getIssue (token) {
+export async function getIssue(token: string) {
   const octokit = getOctokit(token)
-  let issueNumber
-  if (getIssueNumber() !== undefined) {
-    issueNumber = getIssueNumber()
-  } else if (getPrNumber() !== undefined) {
+  let issueNumber = getIssueNumber()
+  if (issueNumber === undefined) {
     issueNumber = getPrNumber()
-  } else {
+  }
+  if (issueNumber === undefined) {
     throw new Error('No Issue Provided')
   }
 
@@ -41,8 +41,8 @@ export async function getIssue (token) {
   return data
 }
 
-export async function createAndInviteToRepo (token, owner, username, repo) {
-  const octokit = getOctokit(token)
+export async function createAndInviteToRepo(token: string, owner: string, username: string, repo: string) {
+  const octokit = getOctokit(token, {}, retry)
   try {
     await octokit.rest.repos.createInOrg({
       org: owner,
@@ -51,42 +51,26 @@ export async function createAndInviteToRepo (token, owner, username, repo) {
       has_projects: false,
       has_wiki: false
     })
-  } catch (err) {
-    let e = err
-    if (e.name === 'HttpError') e = e.response.data
-    if (e && e.errors && e.errors.length && e.errors[0].field === 'name') {
-      return false
+    await octokit.rest.repos.addCollaborator({
+      owner,
+      repo,
+      username,
+      permission: 'admin'
+    })
+  } catch (e) {
+    if (typeof e === "string") {
+      console.error(e)
+    } else if (e instanceof Error) {
+      console.error(e.message)
+    } else {
+      console.error(JSON.stringify(e))
     }
-    console.log('嘤嘤嘤', JSON.stringify(err))
-    throw err
-  }
-  for (let i = 0; i < 3; i++) {
-    try {
-      await octokit.rest.repos.addCollaborator({
-        owner,
-        repo,
-        username,
-        permission: 'admin'
-      })
-      break
-    } catch (err) {
-      let e = err
-      if (e.status === 404) {
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        continue
-      }
-      if (e.name === 'HttpError') e = e.response.data
-      if (e && e.errors && e.errors.length && e.errors[0].field === 'name') {
-        return false
-      }
-      console.log('呜呜呜', JSON.stringify(err))
-      throw err
-    }
+    return false
   }
   return true
 }
 
-export async function addLabel (token, owner, repo, issueNumber, label) {
+export async function addLabel(token: string, owner: string, repo: string, issueNumber: number, label: string) {
   const octokit = getOctokit(token)
   await octokit.rest.issues.addLabels({
     owner,
@@ -96,7 +80,7 @@ export async function addLabel (token, owner, repo, issueNumber, label) {
   })
 }
 
-export async function setLabel (token, owner, repo, issueNumber, labels) {
+export async function setLabel(token: string, owner: string, repo: string, issueNumber: number, labels: string[]) {
   const octokit = getOctokit(token)
   await octokit.rest.issues.setLabels({
     owner,
@@ -106,7 +90,7 @@ export async function setLabel (token, owner, repo, issueNumber, labels) {
   })
 }
 
-export async function leaveComment (token, owner, repo, issueNumber, comment) {
+export async function leaveComment(token: string, owner: string, repo: string, issueNumber: number, comment: string) {
   const octokit = getOctokit(token)
   await octokit.rest.issues.createComment({
     owner,
@@ -116,7 +100,7 @@ export async function leaveComment (token, owner, repo, issueNumber, comment) {
   })
 }
 
-export async function closeIssue (token, owner, repo, issueNumber, isCompleted = false) {
+export async function closeIssue(token: string, owner: string, repo: string, issueNumber: number, isCompleted: boolean = false) {
   const octokit = getOctokit(token)
   await octokit.rest.issues.update({
     owner,
@@ -133,7 +117,7 @@ export async function closeIssue (token, owner, repo, issueNumber, isCompleted =
   })
 }
 
-export async function lockSpamIssue (token, owner, repo, issueNumber) {
+export async function lockSpamIssue(token: string, owner: string, repo: string, issueNumber: number) {
   const octokit = getOctokit(token)
   await octokit.rest.issues.lock({
     owner,
@@ -143,7 +127,7 @@ export async function lockSpamIssue (token, owner, repo, issueNumber) {
   })
 }
 
-export async function orgBlockUser (token, owner, username) {
+export async function orgBlockUser(token: string, owner: string, username: string) {
   const octokit = getOctokit(token)
   await octokit.rest.orgs.blockUser({
     org: owner,
@@ -151,20 +135,29 @@ export async function orgBlockUser (token, owner, username) {
   })
 }
 
-export async function getUser (token, username) {
+export async function getUser(token: string, username: string) {
   const octokit = getOctokit(token)
   return await octokit.rest.users.getByUsername({
     username
   })
 }
 
-export async function isRepoExists (token, owner, repo) {
+export async function isRepoExists(token: string, owner: string, repo: string) {
   const octokit = getOctokit(token)
   try {
-    await octokit.rest.repos.get(owner, repo)
+    await octokit.rest.repos.get({
+      owner,
+      repo,
+    })
     return true
   } catch (e) {
-    console.error(e)
+    if (typeof e === "string") {
+      console.error(e)
+    } else if (e instanceof Error) {
+      console.error(e.message)
+    } else {
+      console.error(JSON.stringify(e))
+    }
     return false
   }
 }
