@@ -12,7 +12,7 @@ export async function checkTxt(pkg: string, github_username: string) {
     for (const x of y) {
       if (!x.startsWith('lsposed-modules-repo-verification=')) continue
       const content = x.split('=', 2)[1]
-      if (content === github_username) return true
+      if (content.toLowerCase() === github_username.toLowerCase()) return true
     }
   }
   return false
