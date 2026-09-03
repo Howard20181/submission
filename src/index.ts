@@ -40,6 +40,9 @@ async function closeSpam(token: string, owner: string, repo: string, issueNo: nu
 }
 
 async function closeInvalid(token: string, owner: string, repo: string, issueNo: number, username: string, close: boolean = true) {
+  if (/^\d/.test(username)) {
+    username = '_' + username
+  }
   await setLabel(token, owner, repo, issueNo, ['invalid']) // clear other labels
   await leaveComment(token, owner, repo, issueNo,
     'It seems like your request has an invalid package name, please consider another package name ' +
