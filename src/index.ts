@@ -32,11 +32,10 @@ async function approve(token: string, owner: string, repo: string, issueNo: numb
   }
 }
 
-async function closeSpam(token: string, owner: string, repo: string, issueNo: number, username: string = '') { // pass username if block
+async function closeSpam(token: string, owner: string, repo: string, issueNo: number) {
   await setLabel(token, owner, repo, issueNo, ['spam']) // clear other labels
   await closeIssue(token, owner, repo, issueNo)
   await lockSpamIssue(token, owner, repo, issueNo)
-  if (username !== '') await orgBlockUser(token, owner, username)
 }
 
 async function closeInvalid(token: string, owner: string, repo: string, issueNo: number, username: string, close: boolean = true) {
@@ -86,7 +85,7 @@ async function run() {
       if (prefixTag === 'invalid') {
         await closeInvalid(token, owner, repo, issueNo, username, false)
       } else if (newLabel === 'spam') {
-        await closeSpam(token, owner, repo, issueNo, username)
+        await closeSpam(token, owner, repo, issueNo)
       } else if (newLabel === 'approved' && prefixTag === 'submission' && title) { // TODO: transfer
         await approve(token, owner, repo, issueNo, username, title)
       }
