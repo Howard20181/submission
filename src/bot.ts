@@ -62,6 +62,9 @@ export function recognizeTitle(title: string) {
 export function checkPackageName(packageName: string) {
   if (!packageName.match(/\./)) return false
   const groups = packageName.split('.')
+  if (groups.length <= 2) {
+    return false
+  }
   for (const group of groups) {
     if (!group.match(/^[a-zA-Z_][a-zA-Z_0-9]*$/) || group.toLowerCase() === 'example') return false
   }
