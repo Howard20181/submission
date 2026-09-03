@@ -7,13 +7,17 @@ resolver.setServers(['1.1.1.1', '8.8.8.8'])
 export async function checkTxt(pkg: string, github_username: string) {
   const hostname = parsePackage(pkg)
   if (hostname === null || hostname === '') return false
-  const txts = await resolver.resolveTxt(hostname)
-  for (const y of txts) {
-    for (const x of y) {
-      if (!x.startsWith('lsposed-modules-repo-verification=')) continue
-      const content = x.split('=', 2)[1]
-      if (content.toLowerCase() === github_username.toLowerCase()) return true
+  try {
+    const txts = await resolver.resolveTxt(hostname)
+    for (const y of txts) {
+      for (const x of y) {
+        if (!x.startsWith('lsposed-modules-repo-verification=')) continue
+        const content = x.split('=', 2)[1]
+        if (content.toLowerCase() === github_username.toLowerCase()) return true
+      }
     }
+  } catch (e) {
+    console.error(e)
   }
   return false
 }
