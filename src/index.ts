@@ -1,8 +1,27 @@
 import { setFailed } from '@actions/core'
 
-import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser } from './github.js'
+import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser, repoInvite } from './github.js'
 import { checkTxt, checkPages, recognizeTitle, checkOrg } from './bot.js'
 import { context } from '@actions/github'
+
+async function approveTransfer(token: string, owner: string, repo: string, issueNo: number, username: string, title: string) {
+  const ok = await repoInvite(token, owner, username, title)
+  if (ok) {
+    await leaveComment(token, owner, repo, issueNo,
+      'Dear developer,\n\n' +
+      'You should find yourself as admin role of the repo now, if you ' +
+      "don't, check your email or [here](https://github.com/Xposed-Modules-Repo/" + title + "/invitations) to accept invitation."
+    )
+    await setLabel(token, owner, repo, issueNo, ['approved']) // clear other labels
+    await closeIssue(token, owner, repo, issueNo, true)
+  } else {
+    await leaveComment(token, owner, repo, issueNo,
+      'error: failed to invite'
+    )
+    await setLabel(token, owner, repo, issueNo, ['invalid']) // clear other labels
+    await closeIssue(token, owner, repo, issueNo)
+  }
+}
 
 async function approve(token: string, owner: string, repo: string, issueNo: number, username: string, title: string) {
   const result = await createAndInviteToRepo(token, owner, username, title)
@@ -79,8 +98,10 @@ async function run() {
         await closeInvalid(token, owner, repo, issueNo, username, false)
       } else if (newLabel === 'spam') {
         await closeSpam(token, owner, repo, issueNo)
-      } else if (newLabel === 'approved' && prefixTag === 'submission' && title) { // TODO: transfer
+      } else if (newLabel === 'approved' && prefixTag === 'submission' && title) {
         await approve(token, owner, repo, issueNo, username, title)
+      } else if (prefixTag === 'transfer' && newLabel === 'approved') {
+        await approveTransfer(token, owner, repo, issueNo, username, title)
       }
     } else if (action === 'opened') {
       // close missing tag issue

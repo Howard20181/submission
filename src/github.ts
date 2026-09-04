@@ -41,6 +41,28 @@ export async function getIssue(token: string) {
   return data
 }
 
+export async function repoInvite(token: string, owner: string, username: string, repo: string) {
+  const octokit = getOctokit(token)
+  try {
+    await octokit.rest.repos.addCollaborator({
+      owner,
+      repo,
+      username,
+      permission: 'admin'
+    })
+  } catch (e) {
+    if (typeof e === "string") {
+      console.error(e)
+    } else if (e instanceof Error) {
+      console.error(e.message)
+    } else {
+      console.error(JSON.stringify(e))
+    }
+    return false
+  }
+  return true
+}
+
 export async function createAndInviteToRepo(token: string, owner: string, username: string, repo: string) {
   const octokit = getOctokit(token, {}, retry)
   try {
