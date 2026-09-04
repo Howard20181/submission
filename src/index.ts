@@ -52,13 +52,6 @@ async function closeInvalid(token: string, owner: string, repo: string, issueNo:
   if (close) await closeIssue(token, owner, repo, issueNo)
 }
 
-async function manualRequest(token: string, owner: string, repo: string, issueNo: number) {
-  await leaveComment(token, owner, repo, issueNo,
-    'To reduce spam, we do not approve your submission immediately due to certain conditions, ' +
-    'please wait for manual approvement.'
-  )
-}
-
 async function run() {
   try {
     const sender_id = context?.payload?.sender?.id
@@ -113,7 +106,8 @@ async function run() {
           await approve(token, owner, repo, issueNo, username, title)
           return
         }
-        await manualRequest(token, owner, repo, issueNo)
+        await closeInvalid(token, owner, repo, issueNo, username)
+        return
       }
 
       // transfer
