@@ -2,7 +2,12 @@
 Submit your Xposed Modules!
 
 ### How to
-To submit your module, please fire an issue with title `[submission] packagename`, where `packagename` is the package name of your module. Then our bot will automatically create a new repository and invite you to be the admin.
+To submit your module, please fire an issue with title `[submission] packagename`, where `packagename` is the application ID of your module. Then our bot will automatically create a new repository and invite you to be the admin.
+
+### Application ID requirement
+- For reverse domain name notation in your application id, please use something you own rather than random domain.
+- You are require to set a TXT record for your root domain: `lsposed-modules-repo-verification=your_github_username`
+- If you do not own any domain, you may use `io.github.{username}` prefix, you GitHub username or organization username will be fine, please made your organization membership public before creating new submission.
 
 ### Repository structure
 - Title: the package name of your module (for example `com.example.xposedmodule`)
@@ -16,7 +21,7 @@ To submit your module, please fire an issue with title `[submission] packagename
 ### Repository content
 - SUMMARY: the summary of your module, will be shown in the front page
 - README.md: the full description of your module
-- For all meta files available please refer to [the example repository](https://github.com/Xposed-Modules-Repo/org.meowcat.example)
+- ~~For all meta files available please refer to [the example repository](https://github.com/Xposed-Modules-Repo/org.meowcat.example)~~
 
 ### Important notes
 1. If your repository is incomplete, it won't be shown
