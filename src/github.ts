@@ -48,7 +48,7 @@ export async function repoInvite(token: string, owner: string, username: string,
       owner,
       repo,
       username,
-      permission: 'admin'
+      permission: 'maintain'
     })
   } catch (e) {
     if (typeof e === "string") {
@@ -77,7 +77,7 @@ export async function createAndInviteToRepo(token: string, owner: string, userna
       owner,
       repo,
       username,
-      permission: 'admin'
+      permission: 'maintain'
     })
   } catch (e) {
     if (typeof e === "string") {
