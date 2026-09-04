@@ -65,6 +65,8 @@ async function closeInvalid(token: string, owner: string, repo: string, issueNo:
   await leaveComment(token, owner, repo, issueNo,
     'It seems like your request has an invalid package name, please consider another package name ' +
     '(e.g. `io.github.' + username + '.[appname]`).\n' +
+    'If you owned the domain of your APK Application ID, you can add a TXT record to your root domain for quick approve:\n\n' +
+    '> `lsposed-modules-repo-verification=your_github_username`\n\n' +
     "If that's not true, please contact a human by " +
     'https://modules.lsposed.org/submission?type=appeal'
   )
