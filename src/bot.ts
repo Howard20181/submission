@@ -27,18 +27,18 @@ function parsePackage(pkg: string) {
   return getDomain(pkg.split('.').reverse().join('.'))
 }
 
-function getPrefix(username: string) {
-  return `io.github.${username}.`
+function getPrefixLowercase(username: string) {
+  return `io.github.${username.toLowerCase()}.`
 }
 
 export function checkPages(pkg: string, username: string) {
-  return pkg.toLowerCase().startsWith(getPrefix(username))
+  return pkg.toLowerCase().startsWith(getPrefixLowercase(username))
 }
 
 export async function checkOrg(token: string, pkg: string, username: string) {
   const orgs = await getUserOrgs(token, username)
   for (const org of orgs) {
-    if (pkg.toLowerCase().startsWith(getPrefix(org.login))) {
+    if (pkg.toLowerCase().startsWith(getPrefixLowercase(org.login))) {
       return true
     }
   }
