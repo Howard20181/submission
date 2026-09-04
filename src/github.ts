@@ -161,3 +161,11 @@ export async function isRepoExists(token: string, owner: string, repo: string) {
     return false
   }
 }
+
+export async function getUserOrgs(token: string, username: string) {
+  const octokit = getOctokit(token)
+  const { data } = await octokit.rest.orgs.listForUser({
+    username
+  })
+  return data
+}

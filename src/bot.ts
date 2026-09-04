@@ -1,5 +1,6 @@
 import { getDomain } from 'tldts'
 import { Resolver } from 'node:dns/promises'
+import { getUserOrgs } from './github'
 
 const resolver = new Resolver()
 resolver.setServers(['1.1.1.1', '8.8.8.8'])
@@ -26,8 +27,22 @@ function parsePackage(pkg: string) {
   return getDomain(pkg.split('.').reverse().join('.'))
 }
 
-export function matchPages(pkg: string, github_username: string) {
-  return pkg.toLowerCase().startsWith(`io.github.${github_username.toLowerCase()}.`)
+function getPrefix(username: string) {
+  return `io.github.${username}.`
+}
+
+export function checkPages(pkg: string, username: string) {
+  return pkg.toLowerCase().startsWith(getPrefix(username))
+}
+
+export async function checkOrg(token: string, pkg: string, username: string) {
+  const orgs = await getUserOrgs(token, username)
+  for (const org of orgs) {
+    if (pkg.toLowerCase().startsWith(getPrefix(org.login))) {
+      return true
+    }
+  }
+  return false
 }
 
 export function recognizeTitle(title: string) {
