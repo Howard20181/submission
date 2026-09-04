@@ -21,6 +21,7 @@ To submit your module, please fire an issue with title `[submission] packagename
 ### Repository content
 - SUMMARY: the summary of your module, will be shown in the front page
 - README.md: the full description of your module
+- Please do not upload your source code here, we don't need your source code
 - ~~For all meta files available please refer to [the example repository](https://github.com/Xposed-Modules-Repo/org.meowcat.example)~~
 
 ### Important notes
