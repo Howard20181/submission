@@ -40,10 +40,10 @@ async function approve(token: string, owner: string, repo: string, issueNo: numb
     await setLabel(token, owner, repo, issueNo, ['approved']) // clear other labels
     await closeIssue(token, owner, repo, issueNo, true)
   } else {
-    username = normalizeUsername(username)
+    const escapedUsername = normalizeUsername(username)
     await leaveComment(token, owner, repo, issueNo,
       'It seems like your package name is already in use, please consider another package name ' +
-      '(e.g. `io.github.' + username + '.' + title.split('.').slice(-1) + '`).\n' +
+      '(e.g. `io.github.' + escapedUsername + '.' + title.split('.').slice(-1) + '`).\n' +
       "If you believe that's a fraudulent use, please contact a human by " +
       'https://modules.lsposed.org/submission?type=appeal'
     )
@@ -70,10 +70,10 @@ async function closeInvalid(token: string, owner: string, repo: string, issueNo:
       'https://modules.lsposed.org/submission?type=appeal'
     )
   } else {
-    username = normalizeUsername(username)
+    const escapedUsername = normalizeUsername(username)
     await leaveComment(token, owner, repo, issueNo,
       'It seems like your request has an invalid package name, please consider another package name ' +
-      '(e.g. `io.github.' + username + '.[appname]`).\n' +
+      '(e.g. `io.github.' + escapedUsername + '.[appname]`).\n' +
       'If you owned the domain of your APK Application ID, you can add a TXT record to your root domain for quick approve:\n\n' +
       '> `lsposed-modules-repo-verification=' + username + '`\n\n' +
       "If that's doesn't help, please contact a human by " +
