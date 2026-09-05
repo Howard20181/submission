@@ -40,6 +40,7 @@ async function approve(token: string, owner: string, repo: string, issueNo: numb
     await setLabel(token, owner, repo, issueNo, ['approved']) // clear other labels
     await closeIssue(token, owner, repo, issueNo, true)
   } else {
+    username = normalizeUsername(username)
     await leaveComment(token, owner, repo, issueNo,
       'It seems like your package name is already in use, please consider another package name ' +
       '(e.g. `io.github.' + username + '.' + title.split('.').slice(-1) + '`).\n' +
