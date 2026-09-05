@@ -1,7 +1,7 @@
 import { setFailed } from '@actions/core'
 
 import { setLabel, closeIssue, createAndInviteToRepo, getIssue, getRepo, isRepoExists, leaveComment, lockSpamIssue, orgBlockUser, repoInvite } from './github.js'
-import { checkTxt, checkPages, recognizeTitle, checkOrg } from './bot.js'
+import { checkTxt, checkPages, recognizeTitle, checkOrg, normalizeUsername, isStartsWithDigit } from './bot.js'
 import { context } from '@actions/github'
 
 async function approveTransfer(token: string, owner: string, repo: string, issueNo: number, username: string, title: string) {
@@ -58,18 +58,27 @@ async function closeSpam(token: string, owner: string, repo: string, issueNo: nu
 }
 
 async function closeInvalid(token: string, owner: string, repo: string, issueNo: number, username: string, close: boolean = true) {
-  if (/^\d/.test(username)) {
-    username = '_' + username
-  }
   await setLabel(token, owner, repo, issueNo, ['invalid']) // clear other labels
-  await leaveComment(token, owner, repo, issueNo,
-    'It seems like your request has an invalid package name, please consider another package name ' +
-    '(e.g. `io.github.' + username.toLowerCase() + '.[appname]`).\n' +
-    'If you owned the domain of your APK Application ID, you can add a TXT record to your root domain for quick approve:\n\n' +
-    '> `lsposed-modules-repo-verification=' + username.toLowerCase() + '`\n\n' +
-    "If that's not true, please contact a human by " +
-    'https://modules.lsposed.org/submission?type=appeal'
-  )
+  if (isStartsWithDigit(username)) {
+     await leaveComment(token, owner, repo, issueNo,
+      'Your username starts with a digit which can not be use as a valid namespace, ' +
+      'please consider creating an organization or purchase a domain with a valid username, ' +
+      'and add a TXT record to your root domain:\n\n' +
+      '> `lsposed-modules-repo-verification=' + username + '`\n\n' +
+      "If that's doesn't help, please contact a human by " +
+      'https://modules.lsposed.org/submission?type=appeal'
+    )
+  } else {
+    username = normalizeUsername(username)
+    await leaveComment(token, owner, repo, issueNo,
+      'It seems like your request has an invalid package name, please consider another package name ' +
+      '(e.g. `io.github.' + username + '.[appname]`).\n' +
+      'If you owned the domain of your APK Application ID, you can add a TXT record to your root domain for quick approve:\n\n' +
+      '> `lsposed-modules-repo-verification=' + username + '`\n\n' +
+      "If that's doesn't help, please contact a human by " +
+      'https://modules.lsposed.org/submission?type=appeal'
+    )
+  }
   if (close) await closeIssue(token, owner, repo, issueNo)
 }
 

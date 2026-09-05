@@ -28,7 +28,15 @@ function parsePackage(pkg: string) {
 }
 
 function getPrefixLowercase(username: string) {
-  return `io.github.${username.toLowerCase()}.`
+  return `io.github.${normalizeUsername(username)}.`
+}
+
+export function normalizeUsername(username: string) {
+  return username.toLowerCase().replaceAll('-', '_')
+}
+
+export function isStartsWithDigit(username: string) {
+  return /^\d/.test(username)
 }
 
 export function checkPages(pkg: string, username: string) {
